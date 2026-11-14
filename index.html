@@ -65,10 +65,6 @@
           <option value="hard_words">hard_words</option>
         </select>
       </div>
-      <div>
-        <label for="id">ID <span class="hint">(ফাঁকা রাখলে নিজে বসবে)</span></label>
-        <input type="number" id="id" inputmode="numeric">
-      </div>
     </div>
 
     <div class="row">
@@ -167,7 +163,7 @@
   $("logoutBtn").onclick = () => sb.auth.signOut();
 
   function clearForm(keepExams){
-    ["id","word","meaning","syn","ant","sen","senbn"].forEach(i => $(i).value = "");
+    ["word","meaning","syn","ant","sen","senbn"].forEach(i => $(i).value = "");
     if (!keepExams) document.querySelectorAll("#exams input").forEach(c => c.checked = false);
   }
   $("clearBtn").onclick = () => { clearForm(false); showMsg(""); };
@@ -181,16 +177,8 @@
     $("saveBtn").disabled = true;
     showMsg("সেভ হচ্ছে...");
 
-    // ID ফাঁকা থাকলে ওই টেবিলের সর্বোচ্চ ID + 1
-    let id = $("id").value ? Number($("id").value) : null;
-    if (id === null) {
-      const { data, error } = await sb.from(table).select("id").order("id", { ascending: false }).limit(1);
-      if (error) { $("saveBtn").disabled = false; return showMsg("ID বের করা যায়নি: " + error.message, "err"); }
-      id = data.length ? data[0].id + 1 : 1001;
-    }
-
+    // ID পাঠানো হয় না, ডেটাবেস নিজেই সিরিয়াল ID বসায়
     const row = {
-      id,
       word,
       part_of_speech: $("pos").value,
       meaning_bn: meaning,
@@ -201,11 +189,11 @@
       exams: [...document.querySelectorAll("#exams input:checked")].map(c => c.value)
     };
 
-    const { error } = await sb.from(table).insert(row);
+    const { data, error } = await sb.from(table).insert(row).select("id").single();
     $("saveBtn").disabled = false;
     if (error) return showMsg("সেভ হয়নি: " + error.message, "err");
 
-    showMsg(`সেভ হয়েছে: ${word} (${table}, id ${id})`, "ok");
+    showMsg(`সেভ হয়েছে: ${word} (${table}, id ${data.id})`, "ok");
     clearForm(true); // পরীক্ষার টিক রেখে দেওয়া হলো, একই পরীক্ষার পরের শব্দ দ্রুত দিতে
     $("word").focus();
   };
