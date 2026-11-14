@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ওয়ার্ড অ্যাডমিন প্যানেল</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#EEF1F5;--card:#fff;--ink:#17202E;--mute:#5B6678;--line:#D5DBE4;--accent:#2C3FA0;--ok:#146C43;--err:#B42318}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Hind Siliguri',system-ui,sans-serif;font-size:16px;line-height:1.5}
+  main{max-width:720px;margin:0 auto;padding:24px 16px 64px}
+  h1{font-size:26px;margin:0 0 4px}
+  .sub{color:var(--mute);margin:0 0 20px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px}
+  label{display:block;font-weight:600;margin:14px 0 4px}
+  .hint{font-weight:400;color:var(--mute);font-size:14px}
+  input[type=text],input[type=email],input[type=password],input[type=number],select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:6px;font:inherit;background:#fff;color:var(--ink)}
+  textarea{min-height:64px;resize:vertical}
+  input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:560px){.row{grid-template-columns:1fr}}
+  .exams{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+  .exams label{display:flex;align-items:center;gap:8px;margin:0;font-weight:500;border:1px solid var(--line);border-radius:6px;padding:8px 12px;cursor:pointer}
+  .exams input{accent-color:var(--accent);width:18px;height:18px}
+  .exams label:has(input:checked){border-color:var(--accent);background:#E8ECFA}
+  button{font:inherit;font-weight:600;border:0;border-radius:6px;padding:11px 20px;cursor:pointer;background:var(--accent);color:#fff}
+  button.ghost{background:transparent;color:var(--mute);border:1px solid var(--line)}
+  button:disabled{opacity:.6;cursor:wait}
+  .bar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+  .actions{display:flex;gap:10px;margin-top:20px}
+  #msg{margin-top:14px;font-weight:500;min-height:24px}
+  #msg.ok{color:var(--ok)} #msg.err{color:var(--err)}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+  <h1>ওয়ার্ড অ্যাডমিন প্যানেল</h1>
+  <p class="sub">নতুন শব্দ যোগ করলে সরাসরি Supabase টেবিলে চলে যাবে।</p>
+
+  <!-- লগইন -->
+  <section id="loginBox" class="card">
+    <label for="email">ইমেইল</label>
+    <input type="email" id="email" autocomplete="username">
+    <label for="password">পাসওয়ার্ড</label>
+    <input type="password" id="password" autocomplete="current-password">
+    <div class="actions"><button id="loginBtn">লগইন করুন</button></div>
+    <div id="loginMsg" class="err" style="margin-top:12px;color:var(--err)"></div>
+  </section>
+
+  <!-- ফর্ম -->
+  <section id="formBox" class="card" hidden>
+    <div class="bar">
+      <span id="who" class="hint"></span>
+      <button class="ghost" id="logoutBtn" type="button">লগআউট</button>
+    </div>
+
+    <div class="row">
+      <div>
+        <label for="table">কোন টেবিলে যাবে</label>
+        <select id="table">
+          <option value="easy_words">easy_words</option>
+          <option value="medium_words">medium_words</option>
+          <option value="hard_words">hard_words</option>
+        </select>
+      </div>
+      <div>
+        <label for="id">ID <span class="hint">(ফাঁকা রাখলে নিজে বসবে)</span></label>
+        <input type="number" id="id" inputmode="numeric">
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label for="word">ইংরেজি শব্দ</label>
+        <input type="text" id="word" autocomplete="off">
+      </div>
+      <div>
+        <label for="pos">পদ (part of speech)</label>
+        <select id="pos">
+          <option>noun</option><option>verb</option><option selected>adjective</option>
+          <option>adverb</option><option>preposition</option><option>conjunction</option>
+          <option>pronoun</option><option>interjection</option>
+        </select>
+      </div>
+    </div>
+
+    <label for="meaning">বাংলা অর্থ</label>
+    <input type="text" id="meaning" autocomplete="off">
+
+    <div class="row">
+      <div>
+        <label for="syn">Synonyms <span class="hint">(কমা দিয়ে আলাদা করুন)</span></label>
+        <input type="text" id="syn" placeholder="glad, cheerful, joyful">
+      </div>
+      <div>
+        <label for="ant">Antonyms <span class="hint">(কমা দিয়ে)</span></label>
+        <input type="text" id="ant" placeholder="sad, unhappy">
+      </div>
+    </div>
+
+    <label for="sen">ইংরেজি বাক্য</label>
+    <textarea id="sen"></textarea>
+    <label for="senbn">বাক্যের বাংলা অনুবাদ</label>
+    <textarea id="senbn"></textarea>
+
+    <label>কোন কোন পরীক্ষায় এসেছে</label>
+    <div class="exams" id="exams"></div>
+
+    <div class="actions">
+      <button id="saveBtn" type="button">সেভ করুন</button>
+      <button class="ghost" id="clearBtn" type="button">ফর্ম খালি করুন</button>
+    </div>
+    <div id="msg" role="status"></div>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+  // ====== এখানে নিজের তথ্য বসান ======
+  const SUPABASE_URL = "https://nyxiahzwrgxjbjruysoq.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_R3ug7cAwzzNguBabczYLDg_VaW-GyHG"; // শুধু anon key, কখনো service_role নয়
+  // নতুন পরীক্ষা যোগ করতে এখানে একটা লাইন বাড়ান
+  const EXAMS = [
+ const EXAMS = [
+  { code: "bcs",       label: "বিসিএস" },
+  { code: "primary",   label: "প্রাথমিক" },
+  { code: "nibondhon", label: "নিবন্ধন" },
+  { code: "ntrc",      label: "এনটিআরসি" },
+  { code: "bank",      label: "ব্যাংক" }
+];
+  // ====================================
+
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const $ = id => document.getElementById(id);
+
+  $("exams").innerHTML = EXAMS.map(e =>
+    `<label><input type="checkbox" value="${e.code}"> ${e.label}</label>`).join("");
+
+  function showMsg(text, type){ const m=$("msg"); m.textContent=text; m.className=type||""; }
+  const toArray = s => s.split(/[,،]/).map(x => x.trim()).filter(Boolean);
+
+  function render(session){
+    const on = !!session;
+    $("loginBox").hidden = on;
+    $("formBox").hidden = !on;
+    if (on) $("who").textContent = session.user.email;
+  }
+
+  sb.auth.getSession().then(({data}) => render(data.session));
+  sb.auth.onAuthStateChange((_e, session) => render(session));
+
+  $("loginBtn").onclick = async () => {
+    $("loginMsg").textContent = "";
+    const { error } = await sb.auth.signInWithPassword({
+      email: $("email").value.trim(), password: $("password").value
+    });
+    if (error) $("loginMsg").textContent = "লগইন হয়নি: " + error.message;
+  };
+  $("logoutBtn").onclick = () => sb.auth.signOut();
+
+  function clearForm(keepExams){
+    ["id","word","meaning","syn","ant","sen","senbn"].forEach(i => $(i).value = "");
+    if (!keepExams) document.querySelectorAll("#exams input").forEach(c => c.checked = false);
+  }
+  $("clearBtn").onclick = () => { clearForm(false); showMsg(""); };
+
+  $("saveBtn").onclick = async () => {
+    const table = $("table").value;
+    const word = $("word").value.trim();
+    const meaning = $("meaning").value.trim();
+    if (!word || !meaning) return showMsg("শব্দ আর বাংলা অর্থ দুটোই দিতে হবে।", "err");
+
+    $("saveBtn").disabled = true;
+    showMsg("সেভ হচ্ছে...");
+
+    // ID ফাঁকা থাকলে ওই টেবিলের সর্বোচ্চ ID + 1
+    let id = $("id").value ? Number($("id").value) : null;
+    if (id === null) {
+      const { data, error } = await sb.from(table).select("id").order("id", { ascending: false }).limit(1);
+      if (error) { $("saveBtn").disabled = false; return showMsg("ID বের করা যায়নি: " + error.message, "err"); }
+      id = data.length ? data[0].id + 1 : 1001;
+    }
+
+    const row = {
+      id,
+      word,
+      part_of_speech: $("pos").value,
+      meaning_bn: meaning,
+      synonyms: toArray($("syn").value),
+      antonyms: toArray($("ant").value),
+      sentence_en: $("sen").value.trim(),
+      sentence_bn: $("senbn").value.trim(),
+      exams: [...document.querySelectorAll("#exams input:checked")].map(c => c.value)
+    };
+
+    const { error } = await sb.from(table).insert(row);
+    $("saveBtn").disabled = false;
+    if (error) return showMsg("সেভ হয়নি: " + error.message, "err");
+
+    showMsg(`সেভ হয়েছে: ${word} (${table}, id ${id})`, "ok");
+    clearForm(true); // পরীক্ষার টিক রেখে দেওয়া হলো, একই পরীক্ষার পরের শব্দ দ্রুত দিতে
+    $("word").focus();
+  };
+</script>
+</body>
+</html>
