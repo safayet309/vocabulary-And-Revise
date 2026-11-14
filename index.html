@@ -99,12 +99,13 @@
   const SUPABASE_ANON_KEY = "sb_publishable_R3ug7cAwzzNguBabczYLDg_VaW-GyHG"; // শুধু publishable/anon key, কখনো secret key নয়
   // নতুন পরীক্ষা যোগ করতে এখানে একটা লাইন বাড়ান (শেষ লাইন বাদে সবার শেষে কমা)
   const EXAMS = [
-    { code: "bcs",       label: "বিসিএস" },
-    { code: "primary",   label: "প্রাথমিক" },
-    { code: "nibondhon", label: "নিবন্ধন" },
-    { code: "ntrc",      label: "এনটিআরসি" },
-    { code: "bank",      label: "ব্যাংক" }
-  ];
+  { code: "bcs",       label: "বিসিএস" },
+  { code: "primary",   label: "প্রাথমিক" },
+  { code: "nibondhon", label: "নিবন্ধন" },
+  { code: "ntrc",      label: "এনটিআরসি" },
+  { code: "bank",      label: "ব্যাংক" },
+  { code: "others",    label: "অন্যান্য" }
+];
   // ====================================
 
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
