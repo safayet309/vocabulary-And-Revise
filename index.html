@@ -116,20 +116,26 @@
   </section>
 </main>
 
+<script>
+  // স্ক্রিপ্টে কোনো এরর হলে লগইন বক্সেই দেখাবে
+  window.addEventListener("error", function (e) {
+    var box = document.getElementById("loginMsg");
+    if (box) box.textContent = "স্ক্রিপ্ট এরর: " + e.message;
+  });
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
   // ====== এখানে নিজের তথ্য বসান ======
   const SUPABASE_URL = "https://nyxiahzwrgxjbjruysoq.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_R3ug7cAwzzNguBabczYLDg_VaW-GyHG"; // শুধু anon key, কখনো service_role নয়
-  // নতুন পরীক্ষা যোগ করতে এখানে একটা লাইন বাড়ান
+  const SUPABASE_ANON_KEY = "sb_publishable_R3ug7cAwzzNguBabczYLDg_VaW-GyHG"; // শুধু publishable/anon key, কখনো secret key নয়
+  // নতুন পরীক্ষা যোগ করতে এখানে একটা লাইন বাড়ান (শেষ লাইন বাদে সবার শেষে কমা)
   const EXAMS = [
- const EXAMS = [
-  { code: "bcs",       label: "বিসিএস" },
-  { code: "primary",   label: "প্রাথমিক" },
-  { code: "nibondhon", label: "নিবন্ধন" },
-  { code: "ntrc",      label: "এনটিআরসি" },
-  { code: "bank",      label: "ব্যাংক" }
-];
+    { code: "bcs",       label: "বিসিএস" },
+    { code: "primary",   label: "প্রাথমিক" },
+    { code: "nibondhon", label: "নিবন্ধন" },
+    { code: "ntrc",      label: "এনটিআরসি" },
+    { code: "bank",      label: "ব্যাংক" }
+  ];
   // ====================================
 
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
